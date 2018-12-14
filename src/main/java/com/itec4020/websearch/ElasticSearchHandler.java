@@ -72,18 +72,21 @@ public class ElasticSearchHandler {
 	 * Index documents into ElasticSearch
 	 */
 	public void index() {
-		indexDocuments("WT01", 0);
-		indexDocuments("WT02", 1);
-		indexDocuments("WT03", 2);
+		int numOfDocuments = 0;
+		
+		numOfDocuments += indexDocuments("WT01", 0);
+		numOfDocuments += indexDocuments("WT02", 1);
+		numOfDocuments += indexDocuments("WT03", 2);
+		
+		System.out.println("Number of Documents indexed: " + numOfDocuments);
 	}
 
 	/**
 	 * Searches given the information
 	 */
 	public String search(String title, String content) {
-		try {
+		try {			
 			Request request = new Request("GET", ELASTIC_PATH + "/_search");
-
 			
 			XContentBuilder builder = jsonBuilder()
 					.startObject()
@@ -154,32 +157,38 @@ public class ElasticSearchHandler {
 		byte[] buffer = new byte[1024];
 
 		try {
-			for (int i = 0; i < files.length; i++) {
-				// Setup input streams to extract data from the file
-				FileInputStream fis = new FileInputStream(files[i]);
-				GZIPInputStream gis = new GZIPInputStream(fis);
-
-				// The file name for the current File
-				String fileName = files[i].getName();
-				String outputName = fileName.substring(0, fileName.indexOf(".GZ")) + ".txt";
-
-				// Setup output stream to push data into
-				FileOutputStream fos = new FileOutputStream(outputPath + "\\" + outputName);
-
-				// Stores data to be written
-				int bytes_read;
-
-				// Write data until the EOF has been reached
-				while ((bytes_read = gis.read(buffer)) > 0) {
-					fos.write(buffer, 0, bytes_read);
+			if(files != null) {
+				for (int i = 0; i < files.length; i++) {
+					// Setup input streams to extract data from the file
+					FileInputStream fis = new FileInputStream(files[i]);
+					GZIPInputStream gis = new GZIPInputStream(fis);
+	
+					// The file name for the current File
+					String fileName = files[i].getName();
+					String outputName = fileName.substring(0, fileName.indexOf(".GZ")) + ".txt";
+	
+					// Setup output stream to push data into
+					FileOutputStream fos = new FileOutputStream(outputPath + "\\" + outputName);
+	
+					// Stores data to be written
+					int bytes_read;
+	
+					// Write data until the EOF has been reached
+					while ((bytes_read = gis.read(buffer)) > 0) {
+						fos.write(buffer, 0, bytes_read);
+					}
+	
+					// Close streams when finished
+					gis.close();
+					fos.close();
 				}
-
-				// Close streams when finished
-				gis.close();
-				fos.close();
+	
+				System.out.println("Decompression complete for path:  " + filePath);
+	
+				
+			} else {
+				System.out.println("Error!  No .GZ files found in directory: " + filePath);
 			}
-
-			System.out.println("Decompression complete for path:  " + filePath);
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -194,14 +203,14 @@ public class ElasticSearchHandler {
 	 */
 	public File[] getFilesByExt(String directory, String extension) {
 		// Make the search case insensitive
-		final String ext = extension.toLowerCase();
+		final String ext = extension.toUpperCase();
 		File fileDir = new File(directory);
 
 		// Returns a list of all files that match the extension
 		return fileDir.listFiles(new FilenameFilter() {
 			// Specify the acceptance filter
 			public boolean accept(File fileDir, String fileName) {
-				return fileName.toLowerCase().endsWith(ext);
+				return fileName.toUpperCase().endsWith(ext);
 			}
 		});
 	}
@@ -214,8 +223,9 @@ public class ElasticSearchHandler {
 	 * 
 	 * @param folder The folder name for the data where the folder name is placed
 	 *               like so: %PROJECT_DIR%/extracted/{folder}
+	 * @return the number of index documents
 	 */
-	public void indexDocuments(String folder, int indexBump) {
+	public int indexDocuments(String folder, int indexBump) {
 		int numOfDocuments = 0;
 		System.out.println("Indexing folder: " + folder);
 
@@ -259,8 +269,7 @@ public class ElasticSearchHandler {
 				});
 			}
 		}
-
-		System.out.println("Number of Documents indexed: " + numOfDocuments);
+		return numOfDocuments;
 	}
 
 	/**

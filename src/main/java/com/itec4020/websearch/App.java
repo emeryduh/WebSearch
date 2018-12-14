@@ -20,7 +20,7 @@ public class App {
 	final int PORT = 8080;
 
 	public static void main(String[] args) {
-		System.out.println("Starting up ");
+		System.out.println("Starting up");
 
 		new App();
 	}
@@ -30,10 +30,10 @@ public class App {
 		
 		try {
 			// Decompresses all documents into .txt files
-			// searcherHandler.decompress();
+			//searchHandler.decompress();
 
 			// Breaks down each .txt file into a separate document and indexes them
-			// searchHandler.index();
+			//searchHandler.index();
 
 			// Run an example search against the ElasticSearch database
 			// searchHandler.search("foreign minorities, Germany", "What language and cultural differences impede the integration" +
@@ -42,7 +42,7 @@ public class App {
 			// Start up the Web Server
 			HttpServer server = HttpServer.create(new InetSocketAddress(8080), 10);
 		    server.createContext("/", new WebServerHandler(searchHandler));
-		    server.setExecutor(null); // creates a default executor
+		    server.setExecutor(null);
 		    server.start();
 		} catch (Exception e) {
 			e.printStackTrace();

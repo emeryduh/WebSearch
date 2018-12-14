@@ -46,21 +46,37 @@ public class WebServerHandler implements HttpHandler {
 
 	public void handle(HttpExchange h) throws IOException {
 		String reqPath = h.getRequestURI().getPath();
-        //String method = h.getRequestMethod();
+        String method = h.getRequestMethod();
         
         // Provide landing page
         if(reqPath.equals("/")) {
         	reqPath = "/index.html";
         }
-
-		System.out.println(reqPath);
+        
 		// Perform search if requested
-		if(reqPath.equalsIgnoreCase("/search") /*&& method.equals("POST")*/) {
+		if(reqPath.equalsIgnoreCase("/search") && method.equals("POST")) {
 			// Set the req path as the search page
 			reqPath = "/index.html";
 			
-	        String result = elastic.search("foreign minorities, Germany", "What language and cultural differences impede the integration" +
-	    			" of foreign minorities in Germany?");
+			// Gather the request parameters
+			String query = h.getRequestURI().getQuery();
+			
+			System.out.println(query);
+			
+			String[] params = query.split("&");
+			String title = "";
+			String content = "";
+			for(int i = 0; i < params.length; i++) {
+				String[] newParam = params[i].split("=");
+				if(newParam[0].equals("title")) {
+					title = newParam[1];
+				} else if (newParam[0].equals("content")) {
+					content = newParam[1];
+				}
+			}
+			
+			// Perform the search
+	        String result = elastic.search(title, content);
 	        
 	        // Send the Search-Results as part of a custom header
 	        h.getResponseHeaders().set("Search-Data", result);
