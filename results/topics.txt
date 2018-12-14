@@ -1,0 +1,369 @@
+<top>
+
+<num> Number: 401 
+<title> foreign minorities, Germany 
+
+<desc> Description: 
+What language and cultural differences impede the integration 
+of foreign minorities in Germany?
+
+<narr> Narrative: 
+A relevant document will focus on the causes of the lack of
+integration in a significant way; that is, the mere mention of
+immigration difficulties is not relevant.  Documents that discuss
+immigration problems unrelated to Germany are also not relevant.  
+
+</top>
+
+<top>
+
+<num> Number: 402 
+<title> behavioral genetics 
+
+<desc> Description: 
+What is happening in the field of behavioral genetics,
+the study of the relative influence of genetic
+and environmental factors on an individual's behavior
+or personality?
+
+<narr> Narrative: 
+Documents describing genetic or environmental factors relating
+to understanding and preventing substance abuse and addictions
+are relevant.  Documents pertaining to attention deficit disorders
+tied in with genetics are also relevant, as are genetic disorders 
+affecting hearing or muscles.  The genome project is relevant
+when tied in with behavior disorders (i.e., mood disorders,
+Alzheimer's disease). 
+
+</top>
+
+<top>
+
+<num> Number: 403 
+<title> osteoporosis 
+
+<desc> Description: 
+Find information on the effects of the dietary intakes
+of potassium, magnesium and fruits and vegetables as
+determinants of bone mineral density in elderly men
+and women thus preventing osteoporosis (bone decay). 
+
+<narr> Narrative: 
+A relevant document may include one or more of the
+dietary intakes in the prevention of osteoporosis.
+Any discussion of the disturbance of nutrition and
+mineral metabolism that results in a decrease in 
+bone mass is also relevant.
+
+</top>
+
+<top>
+
+<num> Number: 404 
+<title> Ireland, peace talks 
+
+<desc> Description: 
+How often were the peace talks in Ireland delayed
+or disrupted as a result of acts of violence?
+
+<narr> Narrative: 
+Any interruptions to the peace process not directly
+attributable to acts of violence are not relevant.
+
+</top>
+
+<top>
+
+<num> Number: 405 
+<title> cosmic events 
+
+<desc> Description: 
+What unexpected or unexplained cosmic events or
+celestial phenomena, such as radiation and 
+supernova outbursts or new comets, have been detected?
+
+<narr> Narrative: 
+New theories or new interpretations concerning 
+known celestial objects made as a result of new 
+technology are not relevant.
+
+</top>
+
+<top>
+
+<num> Number: 406 
+<title> Parkinson's disease 
+
+<desc> Description: 
+What is being done to treat the symptoms of 
+Parkinson's disease and keep the patient 
+functional as long as possible?
+
+<narr> Narrative: 
+A relevant document identifies a drug or treatment 
+program utilized in patient care and provides 
+an indication of success or failure.
+
+</top>
+
+<top>
+
+<num> Number: 407 
+<title> poaching, wildlife preserves 
+
+<desc> Description: 
+What is the impact of poaching on 
+the world's various wildlife preserves? 
+
+<narr> Narrative: 
+A relevant document must discuss poaching in wildlife
+preserves, not in the wild itself.  Also deemed relevant
+is evidence of preventive measures being taken by local
+authorities.
+
+</top>
+
+<top>
+
+<num> Number: 408 
+<title> tropical storms 
+
+<desc> Description: 
+What tropical storms (hurricanes and typhoons) have
+caused significant property damage and loss of life?
+
+<narr> Narrative: 
+The date of the storm, the area affected, and the extent of 
+damage/casualties are all of interest.  Documents that describe
+the damage caused by a tropical storm as "slight", "limited", or
+"small" are not relevant. 
+
+</top>
+
+<top>
+
+<num> Number: 409 
+<title> legal, Pan Am, 103 
+
+<desc> Description: 
+What legal actions have resulted from the destruction
+of Pan Am Flight 103 over Lockerbie, Scotland, on
+December 21, 1988?  
+
+<narr> Narrative: 
+Documents describing any charges, claims, or fines 
+presented to or imposed by any court or tribunal are
+relevant, but documents that discuss charges made in
+diplomatic jousting are not relevant.
+
+</top>
+
+<top>
+
+<num> Number: 410 
+<title> Schengen agreement 
+
+<desc> Description: 
+Who is involved in the Schengen agreement to eliminate border
+controls in Western Europe and what do they hope to accomplish?
+
+<narr> Narrative: 
+Relevant documents will contain any information about the
+actions of signatories of the Schengen agreement such as:
+measures to eliminate border controls (removal of traffic
+obstacles, lifting of traffic restrictions); implementation
+of the information system data bank that contains unified
+visa issuance procedures; or strengthening of border controls
+at the external borders of the treaty area in exchange for 
+free movement at the internal borders.  Discussions of border 
+crossovers for business purposes are not relevant.
+
+</top>
+
+<top>
+
+<num> Number: 411 
+<title> salvaging, shipwreck, treasure 
+
+<desc> Description: 
+Find information on shipwreck salvaging: the
+recovery or attempted recovery of treasure from
+sunken ships.
+
+<narr> Narrative: 
+A relevant document will provide information on
+the actual locating and recovery of treasure; 
+on the technology which makes possible the discovery,
+location and investigation of wreckages which 
+contain or are suspected of containing treasure; or
+on the disposition of the recovered treasure. 
+
+</top>
+
+<top>
+
+<num> Number: 412 
+<title> airport security 
+
+<desc> Description: 
+What security measures are in effect or are proposed
+to go into effect in airports?
+
+<narr> Narrative: 
+A relevant document could identify a specific airport
+and describe the security measures already in effect 
+or proposed for use at that airport.  Relevant items
+could also describe a failure of security that was
+cited as a contributing cause of a tragedy which came 
+to pass or which was later averted.  Comparisons between
+and among airports based on the effectiveness of the
+security of each are also relevant.
+
+</top>
+
+<top>
+
+<num> Number: 413 
+<title> steel production 
+
+<desc> Description: 
+What are new methods of producing steel?
+
+<narr> Narrative: 
+Relevant documents will discuss the processes adapted
+by entrepreneurs who have organized so-called "minimills"
+and are producing steel by methods which differ from
+the old blast furnace method of production.  Documents 
+that identify the new companies, the problems they have
+have encountered, and/or their successes or failures in
+the national and international markets are also relevant.
+
+</top>
+
+<top>
+
+<num> Number: 414 
+<title> Cuba, sugar, exports 
+
+<desc> Description: 
+How much sugar does Cuba export and which
+countries import it?
+
+<narr> Narrative: 
+A relevant document will provide information
+regarding Cuba's sugar trade.  Sugar production
+statistics are not relevant unless exports
+are mentioned explicitly.
+
+</top>
+
+<top>
+
+<num> Number: 415 
+<title> drugs, Golden Triangle 
+
+<desc> Description: 
+What is known about drug trafficking in the
+"Golden Triangle", the area where Burma,
+Thailand and Laos meet?
+
+<narr> Narrative: 
+A relevant document will discuss drug
+trafficking in the Golden Triangle,
+including organizations that produce or
+distribute the drugs; international efforts
+to combat the traffic; or the quantities of
+drugs produced in the area.
+
+</top>
+
+<top>
+
+<num> Number: 416 
+<title> Three Gorges Project 
+
+<desc> Description: 
+What is the status of The Three Gorges Project?
+
+<narr> Narrative: 
+A relevant document will provide the projected
+date of completion of the project, its estimated
+total cost, or the estimated electrical output of
+the the finished project.  Discussions of the
+social, political, or ecological impact of the
+project are not relevant.
+
+</top>
+
+<top>
+
+<num> Number: 417 
+<title> creativity 
+
+<desc> Description: 
+Find ways of measuring creativity.
+
+<narr> Narrative: 
+Relevant items include definitions of creativity,
+descriptions of characteristics associated with
+creativity, and factors linked to creativity. 
+
+</top>
+
+<top>
+
+<num> Number: 418 
+<title> quilts, income 
+
+<desc> Description: 
+In what ways have quilts been used to generate income?
+
+<narr> Narrative: 
+Documents mentioning quilting books, quilting classes,
+quilted objects, and museum exhibits of quilts are all relevant.  
+Documents that discuss AIDs quilts are irrelevant, unless 
+there is specific mention that the quilts are being used 
+for fundraising.
+
+</top>
+
+<top>
+
+<num> Number: 419 
+<title> recycle, automobile tires 
+
+<desc> Description: 
+What new uses have been developed for old
+automobile tires as a means of tire recycling?
+
+<narr> Narrative: 
+A relevant document must show advantageous uses of
+recycled tires, such as:  destructive distillation of 
+scrap rubber for valuable chemicals, reef building
+for fish habitats, filler or binder in asphalt
+roadway mixes, and burning in a controlled 
+environment for heat generation.  
+
+</top>
+
+<top>
+
+<num> Number: 420 
+<title> carbon monoxide poisoning 
+
+<desc> Description: 
+How widespread is carbon monoxide poisoning on 
+a global scale?
+
+<narr> Narrative: 
+Relevant documents will contain data on
+what carbon monoxide poisoning is, symptoms,
+causes, and/or prevention.  Advertisements for
+carbon monoxide protection products or services 
+are not relevant.  Discussions of auto emissions
+and air pollution are not relevant even though
+they can contain carbon monoxide.
+
+</top>
+
+

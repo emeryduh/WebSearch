@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.zip.GZIPInputStream;
 
@@ -113,7 +115,7 @@ public class ElasticSearchHandler {
 					.endObject(); // close open bracket
 				
 			String json = Strings.toString(builder);
-			System.out.println("Request:  " + json);
+			System.out.println("Search request received.");
 			request.setJsonEntity(json);
 			//request.addParameter("pretty", "true");
 
@@ -122,11 +124,8 @@ public class ElasticSearchHandler {
 			// Get the response from the server for the search
 			Response resp = rest.performRequest(request);
 			
-			//System.out.println(EntityUtils.toString(resp.getEntity()));
-			
 			// Return the JSON string that is in the Response
 			return EntityUtils.toString(resp.getEntity());
-			//return "test2";
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -144,8 +143,8 @@ public class ElasticSearchHandler {
 	 */
 	public void decompressDirectory(String folder) {
 		// Establish paths to the given folders
-		String filePath = System.getProperty("user.dir") + "\\data\\" + folder;
-		String outputPath = System.getProperty("user.dir") + "\\extracted\\" + folder;
+		String filePath = System.getProperty("user.dir") + "//data//" + folder;
+		String outputPath = System.getProperty("user.dir") + "//extracted//" + folder;
 
 		// Create the output directories if they don't exist
 		new File(outputPath).mkdirs();
@@ -292,7 +291,7 @@ public class ElasticSearchHandler {
 			int i = 0;
 
 			// Break each Document (<DOC>) down into it's own index
-			// Shift out the top-most DOC element to be processed
+			// Pull the specified DOC element by index to be processed
 			while ((doc = entireDoc.select("doc").remove(i)) != null) {
 				jsons.add(getJSONFromData(doc));
 				i++;
@@ -388,5 +387,79 @@ public class ElasticSearchHandler {
 		}
 
 		e.remove();
+	}
+	
+	/**
+	 * Queries search for the JSON to be output for the assignment submission.
+	 * Assumes that the file provided is in the format of the text file
+	 * provided online.
+	 * 
+	 * @param path The path to the topics file
+	 * @return The map of all 20 search query result sets.  Use the topicNum
+	 * as a key to look up values.  401 is the first index, 402 second, so on.
+	 */
+	public Map<String, String> queryTopics(String path) {
+		// The Map to be passed back once complete
+		Map<String, String> jsonMap = new HashMap<String, String>();
+		
+		System.out.println("Querying topics from: " + path);
+		
+		try {
+			// The entire document that is currently being parsed.
+			Document entireDoc = Jsoup.parse(new File(path), null);
+			
+			for(int i = 0; i < entireDoc.select("top").size(); i++) {
+				Element topic = entireDoc.select("top").get(i);
+				String[] results = searchFromTopic(topic);
+				jsonMap.put(results[0], results[1]);
+			}
+			
+			System.out.println("Total topics found: " + entireDoc.select("top").size());
+		} catch (IOException errIO) {
+			errIO.printStackTrace();
+		}
+		
+		return jsonMap;
+	}
+	
+	/**
+	 * Extracts data from the given Element into the JSON format. It is expected
+	 * that the Element (e) provided was generated from Jsoup pulling out a single top
+	 * tag. (i.e. the root element must have no siblings and must be a top tag)
+	 * 
+	 * @param e The top tag element with all information inside
+	 * @return The topic num[0] and JSON string[1] for the executed search
+	 * inside a String array.
+	 */
+	public String[] searchFromTopic(Element e) {
+		String topicNum = "", title = "", desc = "", narr = "";
+		Element ele;
+		
+		// Only update the Strings if the elements exist
+		if ((ele = e.select("narr").first()) != null) {
+			narr = ele.text().substring(ele.text().indexOf(":") + 2);
+			ele.remove();
+		}
+
+		if ((ele = e.select("desc").first()) != null) {
+			desc = ele.text().substring(ele.text().indexOf(":") + 2);
+			ele.remove();
+		}
+
+		
+		if ((ele = e.select("title").first()) != null) {
+			title = ele.text();
+			ele.remove();
+		}
+		
+		if ((ele = e.select("num").first()) != null) {
+			topicNum = ele.text().substring(ele.text().indexOf(":") + 2);
+		}
+		
+		String[] results = new String[2];
+		results[0] = topicNum;
+		results[1] = search(title, desc + " " + narr);
+		// Perform the search with the data provided
+		return results;
 	}
 }

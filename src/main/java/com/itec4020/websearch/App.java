@@ -1,6 +1,8 @@
 package com.itec4020.websearch;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
+
 import com.sun.net.httpserver.HttpServer;
 
 /**
@@ -18,6 +20,8 @@ public class App {
 	
 	// Port for WebServer
 	final int PORT = 8080;
+	
+	ElasticSearchHandler searchHandler;
 
 	public static void main(String[] args) {
 		System.out.println("Starting up");
@@ -26,16 +30,16 @@ public class App {
 	}
 	
 	public App() {
-		ElasticSearchHandler searchHandler = new ElasticSearchHandler();
+		searchHandler = new ElasticSearchHandler();
 		
 		try {
 			// Decompresses all documents into .txt files
-			//searchHandler.decompress();
+			searchHandler.decompress();
 
 			// Breaks down each .txt file into a separate document and indexes them
-			//searchHandler.index();
+			searchHandler.index();
 
-			// Run an example search against the ElasticSearch database
+			// Run a search against the ElasticSearch database
 			// searchHandler.search("foreign minorities, Germany", "What language and cultural differences impede the integration" +
 			//" of foreign minorities in Germany?");
 			
@@ -44,6 +48,9 @@ public class App {
 		    server.createContext("/", new WebServerHandler(searchHandler));
 		    server.setExecutor(null);
 		    server.start();
+		    
+		    // Create the results file for the 20 topic queries
+		    outputTopicResults();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -53,7 +60,8 @@ public class App {
 	 * This function will be used to generate the .txt file for the assignment submission.
 	 * It will execute the 20 topic queries as they come up in the topics file.
 	 */
-	public void outputSearch() {
-		
+	public void outputTopicResults() {
+		Map<String, String> topicMap = searchHandler.queryTopics("results/topics.txt");
+		ResultsGenerator.generateOutputFile(topicMap);
 	}
 }

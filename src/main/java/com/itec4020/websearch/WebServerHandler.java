@@ -60,12 +60,11 @@ public class WebServerHandler implements HttpHandler {
 			
 			// Gather the request parameters
 			String query = h.getRequestURI().getQuery();
-			
-			System.out.println(query);
-			
 			String[] params = query.split("&");
+			
 			String title = "";
 			String content = "";
+			// Set the values based on the request parameters
 			for(int i = 0; i < params.length; i++) {
 				String[] newParam = params[i].split("=");
 				if(newParam[0].equals("title")) {
@@ -80,15 +79,16 @@ public class WebServerHandler implements HttpHandler {
 	        
 	        // Send the Search-Results as part of a custom header
 	        h.getResponseHeaders().set("Search-Data", result);
-		} else {
-			
 		}
 		
 		// Find the file in the root directory
 		File f = new File(ROOT_DIRECTORY, reqPath);
 		
         try {
-        	// Run a check if there is a Path Traversal attack happening
+        	// Get the canonical path to this directory to check if a 
+        	// Path Traversal attack is happening.  If the canonical
+        	// path does not match the ROOT_DIRECTORY path then we know
+        	// and attack is being attempted.
             File canonFile = f.getCanonicalFile();
 	        String canonPath = canonFile.getPath();
 	        if (! canonPath.startsWith(new File(ROOT_DIRECTORY).getCanonicalPath())) {
