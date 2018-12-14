@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="ITEC4020-A3">
+    <meta name="author" content="Group 8">
+
+    <title>Web Search</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/websearch.css" rel="stylesheet">
+
+  </head>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top" style="font-family:times"><h1>Web Search</h1></a>
+        <input class="form-control mr-sm-2" style="width:500px" id="search" type="text" placeholder="Search">
+        <button class="js-scroll-trigger btn text-uppercase btn-outline-warning" id="sendMessageButton" onclick="doSearch()">Search</button>
+
+        <form class="form-inline">
+          <input class="form-control mr-sm-2" style="width:500px" id="search" type="text" placeholder="Search">
+          <button class="js-scroll-trigger btn text-uppercase btn-outline-warning" id="sendMessageButton" onclick="doSearch()">Search</button>
+          <!--  -->
+        </form>
+      </div>
+    </nav>
+
+    <!-- Number of Results -->
+    <section id="resultnum">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12" id="total"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <div class="container">
+      <div class="row">
+        <div id="hits"></div>
+      </div>
+    </div>
+
+    <script type="application/javascript">
+  	function doSearch () {
+
+      var needle = "";
+
+	    // Perform the request.
+      var xmlHttp = new XMLHttpRequest();
+	    xmlHttp.open('GET', document.location, false);
+	    xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	    xmlHttp.send(null);
+      var jsonResp = xmlHttp.getResponseHeader("Search-Data");
+
+      if(jsonResp != null) {
+        jsonResp = JSON.parse(jsonResp);
+
+        // Print results on screen.
+  	    var output = '';
+  	    for (var i = 0; i < jsonResp.hits.hits.length; i++) {
+          output += '<h3>' + jsonResp.hits.hits[i]._source.title + '</h3><br />';
+          output += jsonResp.hits.hits[i]._source.docno + '<br />';
+          output += jsonResp.hits.hits[i]._source.keywords + '<br />';
+          output += jsonResp.hits.hits[i]._source.content + '<br />';
+        }
+        document.getElementById('total').innerHTML = '<h2>Showing ' + jsonResp.hits.hits.length + ' results</h2>';
+        document.getElementById('hits').innerHTML = output;
+      }
+    }
+
+    console.log(document.location.origin);
+    </script>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.bundle.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="js/jquery.easing.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="js/websearch.js"></script>
+
+  </body>
+
+</html>
