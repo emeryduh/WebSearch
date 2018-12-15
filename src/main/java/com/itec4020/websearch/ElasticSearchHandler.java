@@ -2,9 +2,11 @@ package com.itec4020.websearch;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class ElasticSearchHandler {
 	
@@ -32,6 +35,23 @@ public class ElasticSearchHandler {
 
 	// Location for ElasticSearch index
 	final String ELASTIC_PATH = "/files/documents";
+	
+	// Path used to read in compressed files
+	final String COMPRESSED_DATA_PATH = "//data//";
+	
+	// Path used to output decompressed files
+	final String DECOMPRESS_PATH = "//extracted//";
+	
+	// Paths for the HTML to be stored for easy access
+	// Located in {PROJECT_DIR}/{HTML_PATH_INTERNAL_PREFIX}/{HTML_PATH_PUBLIC}
+	final String HTML_PATH_INTERNAL = "//public//pages//";
+	final String HTML_PATH_PUBLIC = "/pages/";
+	
+	// Stats related variables for analysis
+	// Total number of documents indexed thus far
+	int numOfDocuments = 0;
+	int indexSuccesses = 0;
+	int indexFailures = 0;
 	
 	public ElasticSearchHandler() {
 		open();
@@ -74,13 +94,12 @@ public class ElasticSearchHandler {
 	 * Index documents into ElasticSearch
 	 */
 	public void index() {
-		int numOfDocuments = 0;
-		
-		numOfDocuments += indexDocuments("WT01", 0);
-		numOfDocuments += indexDocuments("WT02", 1);
-		numOfDocuments += indexDocuments("WT03", 2);
+		indexDocuments("WT01");
+		indexDocuments("WT02");
+		indexDocuments("WT03");
 		
 		System.out.println("Number of Documents indexed: " + numOfDocuments);
+		System.out.println("Successes: " + indexSuccesses + "\tFailures: " + indexFailures);
 	}
 
 	/**
@@ -92,7 +111,7 @@ public class ElasticSearchHandler {
 			
 			XContentBuilder builder = jsonBuilder()
 					.startObject()
-					.array("_source", "title", "docno")
+					.array("_source", "title", "docno", "url")
 					.startObject("query")
 					.startObject("bool")
 					.startArray("should")
@@ -143,8 +162,8 @@ public class ElasticSearchHandler {
 	 */
 	public void decompressDirectory(String folder) {
 		// Establish paths to the given folders
-		String filePath = System.getProperty("user.dir") + "//data//" + folder;
-		String outputPath = System.getProperty("user.dir") + "//extracted//" + folder;
+		String filePath = System.getProperty("user.dir") + COMPRESSED_DATA_PATH + folder;
+		String outputPath = System.getProperty("user.dir") + DECOMPRESS_PATH + folder;
 
 		// Create the output directories if they don't exist
 		new File(outputPath).mkdirs();
@@ -224,12 +243,11 @@ public class ElasticSearchHandler {
 	 *               like so: %PROJECT_DIR%/extracted/{folder}
 	 * @return the number of index documents
 	 */
-	public int indexDocuments(String folder, int indexBump) {
-		int numOfDocuments = 0;
+	public void indexDocuments(String folder) {
 		System.out.println("Indexing folder: " + folder);
 
 		// Setup the file path
-		String filePath = System.getProperty("user.dir") + "\\extracted\\" + folder;
+		String filePath = System.getProperty("user.dir") + DECOMPRESS_PATH + folder;
 
 		// Gather all files with the .txt extension in the file path
 		File[] files = getFilesByExt(filePath, ".txt");
@@ -240,16 +258,17 @@ public class ElasticSearchHandler {
 		final CountDownLatch latch = new CountDownLatch(files.length);
 
 		for (int i = 0; i < files.length; i++) {
-			System.out.println("Indexing file " + i);
+			System.out.println("Indexing file " + files[i].getName());
 
 			// Gather all relevant JSONs for this file's documents
 			ArrayList<String> jsons = getJSONsFromPath(files[i].getPath());
 			int size = jsons.size();
 
 			for (int j = 0; j < size; j++) {
+				// Increment out documents indexed stat
 				numOfDocuments++;
 				// Assign each page an index assuming i are files, and j are documents
-				int documentIndex = (i * 10000) + j + (indexBump * 100000);
+				int documentIndex = numOfDocuments;
 
 				// Build relevant requests
 				Request request = new Request("PUT", ELASTIC_PATH + "/" + documentIndex);
@@ -257,18 +276,18 @@ public class ElasticSearchHandler {
 
 				rest.performRequestAsync(request, new ResponseListener() {
 					public void onSuccess(Response response) {
-						// System.out.println(response);
 						latch.countDown();
+						indexSuccesses++;
 					}
 
 					public void onFailure(Exception exception) {
 						System.out.println(exception);
 						latch.countDown();
+						indexFailures++;
 					}
 				});
 			}
 		}
-		return numOfDocuments;
 	}
 
 	/**
@@ -287,14 +306,15 @@ public class ElasticSearchHandler {
 			// The entire document that is currently being parsed.
 			Document entireDoc = Jsoup.parse(new File(path), null);
 
-			Element doc;
-			int i = 0;
-
 			// Break each Document (<DOC>) down into it's own index
 			// Pull the specified DOC element by index to be processed
-			while ((doc = entireDoc.select("doc").remove(i)) != null) {
+			Elements docElements = entireDoc.select("doc");
+			//System.out.println("\n\n\nNumber of total elements for file:\t" + docElements.size());
+			
+			for(Element doc : docElements) {
 				jsons.add(getJSONFromData(doc));
-				i++;
+				
+				//System.out.println("Element Size:\t" + doc.toString().length() + "\n\n");
 			}
 		} catch (NullPointerException errNull) {
 			errNull.printStackTrace();
@@ -321,53 +341,88 @@ public class ElasticSearchHandler {
 		try {
 			String title = "", docno = "", olddocno = "", keywords = "", content = "";
 			Element ele;
+			String contentMethod = "";
+			
+			// This can occur if some elements within a document aren't properly closed
+			// If so, remove all elements after the first
+			if(e.select("doc").size() > 1) {
+				int i = 0;
+				for(Element clean : e.select("doc")) {
+					if (i != 0) { 
+						clean.remove();
+					}
+					i++;
+				}
+				System.out.println("Improperly closed elements found, trimming file.");
+			}
 
 			// Only update the Strings if the elements exist
-			if ((ele = e.select("title").first()) != null) {
+			if ((ele = e.selectFirst("title")) != null) {
 				title = ele.text();
 			}
 
-			if ((ele = e.select("docno").first()) != null) {
+			if ((ele = e.selectFirst("docno")) != null) {
 				docno = ele.text();
 			}
 
-			if ((ele = e.select("docoldno").first()) != null) {
+			if ((ele = e.selectFirst("docoldno")) != null) {
 				olddocno = ele.text();
 			}
 
-			if ((ele = e.select("meta").first()) != null) {
+			if ((ele = e.selectFirst("meta")) != null) {
 				if (ele.hasAttr("name") && ele.attr("name") == "keywords") {
 					if (ele.hasAttr("content")) {
 						keywords = ele.attr("content");
 						System.out.println("FOUND KEYWORDS: " + keywords);
 					}
 				}
+
+				//System.out.println("Found META tag in file: " + docno);
 			}
 
 			// Gather only the body of the document as text content
-			if ((ele = e.select("html").first()) != null) {
+			if ((ele = e.selectFirst("html")) != null) {
 				content = ele.text();
-			} else if ((ele = e.select("body").first()) != null) {
+				contentMethod = "html";
+				System.out.println("HTML FOUND");
+			} else if ((ele = e.selectFirst("body")) != null) {
 				content = ele.text();
-			} else if ((ele = e.select("DOCHDR").first()) != null) {
+				contentMethod = "body";
+			} else if ((ele = e.selectFirst("DOCHDR")) != null) {
+				if(docno.equals("WT01-B01-8")) {
+					//System.out.println("\n\nPre Trim\n--------\n" + e.toString());
+				}
 				// If the document is malformed and is missing opening html and body tags
 				// then instead strip out everything above and including the <DOCHDR>.
 				// Then set the content as all remaining text for this <DOC>.
 				int i = ele.elementSiblingIndex();
 
+				//System.out.println("DOCHDR Sibling Index:\t" + i);
 				// Recursively remove all siblings above the DOCHDR
 				removePreviousSiblings(ele, i);
 				content = e.text();
+
+				if(docno.equals("WT01-B01-8")) { //"WT01-B01-44" has trimming issue where HTML is missing
+					//System.out.println("\n\nPost Trim\n--------\n" + e.toString());
+				}
+				contentMethod = "DOCHDR Trim";
 			} else {
 				// In the unlikely scenario that the document is malformed and doesn't have an
 				// html, body, or DOCHDR tag, then instead set the content as the entire <DOC>
 				content = e.text();
+
+				contentMethod = "Full";
 			}
+			
+			// Store the document to be served in searches
+			storeDocument(docno, e.html());
 
 			// Build the json using the extracted data
 			XContentBuilder builder = jsonBuilder().startObject().field("title", title).field("docno", docno)
-					.field("olddocno", olddocno).field("keywords", keywords).field("content", content).endObject();
+					.field("olddocno", olddocno).field("keywords", keywords).field("content", content)
+					.field("url", HTML_PATH_PUBLIC + docno + ".html").endObject();
 			
+			//System.out.println("DocNo:\t" + docno + "\tContent Method:\t" + contentMethod);
 			return Strings.toString(builder);
 		} catch (Exception exc) {
 			exc.printStackTrace();
@@ -387,6 +442,35 @@ public class ElasticSearchHandler {
 		}
 
 		e.remove();
+	}
+	
+	/**
+	 * Stores the provided document data into it's own HTML file for serving.
+	 * 
+	 * @param docno The document number (e.g. WT01-B01-7)
+	 * @param data The document excluding the DOCHDR
+	 */
+	public void storeDocument(String docno, String data) {
+		// Establish the results output path
+		String outputPath = System.getProperty("user.dir") + HTML_PATH_INTERNAL;
+		
+		String fileName = docno + ".html";
+				
+		// Create the output directories if they don't exist
+		new File(outputPath).mkdirs();
+		
+		try {
+			// Setup the writer to output to the file
+			BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath + fileName));
+			
+			// Write the data to the file
+			writer.write(data);
+			
+			// Close the writer when done
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -458,8 +542,9 @@ public class ElasticSearchHandler {
 		
 		String[] results = new String[2];
 		results[0] = topicNum;
-		results[1] = search(title, desc + " " + narr);
 		// Perform the search with the data provided
+		results[1] = search(title, desc + " " + narr);
+		
 		return results;
 	}
 }

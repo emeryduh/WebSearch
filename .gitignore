@@ -1,5 +1,6 @@
 # Project specific Ignores
 extracted/
+public/pages/
 
 # Eclipse Ignores
 .metadata

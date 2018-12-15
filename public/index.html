@@ -23,10 +23,23 @@
     <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
       <div class="container">
         <a class="navbar-brand js-scroll-trigger" href="#page-top" style="font-family:times"><h1>Web Search</h1></a>
-        <form class="form-inline">
-          <input class="form-control mr-sm-2" style="width:500px" id="search" type="text" placeholder="Search">
+        <form class="form-inline dropdown">
+          <input class="form-control" style="width:500px" id="search" type="text" placeholder="Search">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></button>
+          <div class="dropdown-menu" role="menu">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <div class="dropdown" style="padding: 20px 20px">
+                  <h2>Advanced Search</h2><hr />
+                  <input class="form-control" id="title" style="width:500px" type="text" placeholder="Title"/><br />
+                  <input class="form-control" id="desc" style="width:500px" type="text" placeholder="Description"/><br />
+                  <input class="form-control" id="narr" style="width:500px" type="text" placeholder="Narrative"/><hr />
+                </div>
+              </div>
+              <button class="js-scroll-trigger btn text-uppercase btn-outline-warning" id="sendMessageButton" style="width: 100%" type="button" onclick="doSearch()">Search</button>
+            </form>
+          </div>
           <button class="js-scroll-trigger btn text-uppercase btn-outline-warning" id="sendMessageButton" type="button" onclick="doSearch()">Search</button>
-          <!--  -->
         </form>
       </div>
     </nav>
@@ -35,7 +48,7 @@
     <section id="resultnum">
       <div class="container">
         <div class="row">
-          <div class="col-lg-12" style="color:white" id="total"></div>
+          <div class="col-lg-12" id="total"></div>
         </div>
       </div>
     </section>
@@ -43,7 +56,7 @@
     <!-- Results -->
     <div class="container">
       <div class="row">
-        <div id="hits"></div>
+        <div class="col-lg-12" id="hits"></div>
       </div>
     </div>
 
@@ -87,8 +100,13 @@
         // Print results on screen.
   	    var output = '<br />';
   	    for (var i = 0; i < jsonResp.hits.hits.length; i++) {
-          output += '<h3>' + jsonResp.hits.hits[i]._source.title + '</h3>';
-          output += jsonResp.hits.hits[i]._source.docno + '<br /><br />';
+          var title = jsonResp.hits.hits[i]._source.title;
+          if(title.length == 0) {
+            title = "No title for this document";
+          }
+          output += '<h3>' + title + '</h3>';
+          output += jsonResp.hits.hits[i]._source.docno + '<br />';
+          output += '<a href=\"' + jsonResp.hits.hits[i]._source.url + '\">Go to page</a><br /><br />';
         }
         document.getElementById('total').innerHTML = '<h2>Showing ' + jsonResp.hits.hits.length + ' results</h2>';
         document.getElementById('hits').innerHTML = output;
