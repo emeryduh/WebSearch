@@ -6,14 +6,18 @@ import java.util.Map;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * Assignment 3 for ITEC 4020 WebSearch
+ * Assignment 3 for ITEC 4020
+ * WebSearch
  * 
  * Group: 8
  * 
- * This assignment can be decomposed into the following tasks: - Extracting data
- * from the .GZ compressed form - Breaking down documents into indexable parts -
- * Indexing all documents - Searching on the indexed documents - Generating
- * results from the searches to be stored
+ * This assignment can be decomposed into the following tasks:
+ * - Extracting data from the .GZ compressed form
+ * - Breaking down documents into indexable parts
+ * - Indexing all documents
+ * - Searching on the indexed documents
+ * - Generating results from the searches to be stored
+ * - Serving web pages to interact with the application
  */
 @SuppressWarnings("restriction")
 public class App {
@@ -38,12 +42,8 @@ public class App {
 
 			// Breaks down each .txt file into a separate document and indexes them
 			searchHandler.index();
-
-			// Run a search against the ElasticSearch database
-			// searchHandler.search("foreign minorities, Germany", "What language and cultural differences impede the integration" +
-			//" of foreign minorities in Germany?");
 			
-			// Start up the Web Server
+			// Start up the Web Server to handle requests
 			HttpServer server = HttpServer.create(new InetSocketAddress(8080), 10);
 		    server.createContext("/", new WebServerHandler(searchHandler));
 		    server.setExecutor(null);

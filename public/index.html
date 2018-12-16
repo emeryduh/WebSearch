@@ -104,9 +104,8 @@
           if(title.length == 0) {
             title = "No title for this document";
           }
-          output += '<h3>' + title + '</h3>';
-          output += jsonResp.hits.hits[i]._source.docno + '<br />';
-          output += '<a href=\"' + jsonResp.hits.hits[i]._source.url + '\">Go to page</a><br /><br />';
+          output += '<div class = highlight-result><h3><a href=\"' + jsonResp.hits.hits[i]._source.url + '\" target="_blank" rel="noopener">' + title + '</a></h3>';
+          output += 'Document Number: ' + jsonResp.hits.hits[i]._source.docno + '<br /></div><hr />';
         }
         document.getElementById('total').innerHTML = '<h2>Showing ' + jsonResp.hits.hits.length + ' results</h2>';
         document.getElementById('hits').innerHTML = output;

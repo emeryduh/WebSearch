@@ -14,10 +14,13 @@ import com.sun.net.httpserver.HttpHandler;
 @SuppressWarnings("restriction")
 public class WebServerHandler implements HttpHandler {
 	
+	// Directory to serve static files from
 	final String ROOT_DIRECTORY = "./public";
 	
+	// Used to call ElasticSearch functions
 	ElasticSearchHandler elastic;
 	
+	// Content-Type (MIME) map
 	private static final Map<String,String> MIME_MAP = new HashMap<String, String>();
     static {
         MIME_MAP.put("appcache", "text/cache-manifest");
@@ -43,7 +46,10 @@ public class WebServerHandler implements HttpHandler {
     public WebServerHandler(ElasticSearchHandler esh) {
     	elastic = esh;
     }
-
+    
+    /**
+     * Handles the HTTP requests
+     */
 	public void handle(HttpExchange h) throws IOException {
 		String reqPath = h.getRequestURI().getPath();
         String method = h.getRequestMethod();
@@ -120,7 +126,6 @@ public class WebServerHandler implements HttpHandler {
 	 * 
 	 * @param h
 	 * @param errorCode
-	 * @param description
 	 * @throws IOException
 	 */
 	private void sendError(HttpExchange h, int errorCode) throws IOException {
@@ -133,6 +138,13 @@ public class WebServerHandler implements HttpHandler {
         os.close();
     }
 	
+	/**
+	 * Returns the extension string to be used to get the content type provided in the
+	 * response.
+	 * 
+	 * @param path The path to the file being checked against
+	 * @return The extension for the provided file path
+	 */
 	private static String getExtension(String path) {
         int slashIndex = path.lastIndexOf('/');
         String basename = (slashIndex < 0) ? path : path.substring(slashIndex + 1);
@@ -145,6 +157,14 @@ public class WebServerHandler implements HttpHandler {
         }
     }
 	
+	/**
+	 * Writes data from an established InputStream into the given OutputStream.  Used for
+	 * reading in files to be served to the user.
+	 * 
+	 * @param is The input stream to read from
+	 * @param os The output stream to write data into
+	 * @throws IOException
+	 */
 	private void copyStream(InputStream is, OutputStream os) throws IOException {
         byte[] buf = new byte[4096];
         int n;

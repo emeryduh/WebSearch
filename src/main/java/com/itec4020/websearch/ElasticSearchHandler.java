@@ -50,8 +50,6 @@ public class ElasticSearchHandler {
 	// Stats related variables for analysis
 	// Total number of documents indexed thus far
 	int numOfDocuments = 0;
-	int indexSuccesses = 0;
-	int indexFailures = 0;
 	
 	public ElasticSearchHandler() {
 		open();
@@ -99,7 +97,6 @@ public class ElasticSearchHandler {
 		indexDocuments("WT03");
 		
 		System.out.println("Number of Documents indexed: " + numOfDocuments);
-		System.out.println("Successes: " + indexSuccesses + "\tFailures: " + indexFailures);
 	}
 
 	/**
@@ -146,7 +143,7 @@ public class ElasticSearchHandler {
 			// Return the JSON string that is in the Response
 			return EntityUtils.toString(resp.getEntity());
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		
 		return null;
@@ -202,13 +199,11 @@ public class ElasticSearchHandler {
 				}
 	
 				System.out.println("Decompression complete for path:  " + filePath);
-	
-				
 			} else {
 				System.out.println("Error!  No .GZ files found in directory: " + filePath);
 			}
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 
@@ -277,13 +272,11 @@ public class ElasticSearchHandler {
 				rest.performRequestAsync(request, new ResponseListener() {
 					public void onSuccess(Response response) {
 						latch.countDown();
-						indexSuccesses++;
 					}
 
 					public void onFailure(Exception exception) {
 						System.out.println(exception);
 						latch.countDown();
-						indexFailures++;
 					}
 				});
 			}
@@ -309,12 +302,9 @@ public class ElasticSearchHandler {
 			// Break each Document (<DOC>) down into it's own index
 			// Pull the specified DOC element by index to be processed
 			Elements docElements = entireDoc.select("doc");
-			//System.out.println("\n\n\nNumber of total elements for file:\t" + docElements.size());
 			
 			for(Element doc : docElements) {
 				jsons.add(getJSONFromData(doc));
-				
-				//System.out.println("Element Size:\t" + doc.toString().length() + "\n\n");
 			}
 		} catch (NullPointerException errNull) {
 			errNull.printStackTrace();
@@ -341,7 +331,6 @@ public class ElasticSearchHandler {
 		try {
 			String title = "", docno = "", olddocno = "", keywords = "", content = "";
 			Element ele;
-			String contentMethod = "";
 			
 			// This can occur if some elements within a document aren't properly closed
 			// If so, remove all elements after the first
@@ -353,7 +342,6 @@ public class ElasticSearchHandler {
 					}
 					i++;
 				}
-				System.out.println("Improperly closed elements found, trimming file.");
 			}
 
 			// Only update the Strings if the elements exist
@@ -376,42 +364,26 @@ public class ElasticSearchHandler {
 						System.out.println("FOUND KEYWORDS: " + keywords);
 					}
 				}
-
-				//System.out.println("Found META tag in file: " + docno);
 			}
 
 			// Gather only the body of the document as text content
 			if ((ele = e.selectFirst("html")) != null) {
 				content = ele.text();
-				contentMethod = "html";
-				System.out.println("HTML FOUND");
 			} else if ((ele = e.selectFirst("body")) != null) {
 				content = ele.text();
-				contentMethod = "body";
 			} else if ((ele = e.selectFirst("DOCHDR")) != null) {
-				if(docno.equals("WT01-B01-8")) {
-					//System.out.println("\n\nPre Trim\n--------\n" + e.toString());
-				}
 				// If the document is malformed and is missing opening html and body tags
 				// then instead strip out everything above and including the <DOCHDR>.
 				// Then set the content as all remaining text for this <DOC>.
 				int i = ele.elementSiblingIndex();
-
-				//System.out.println("DOCHDR Sibling Index:\t" + i);
+				
 				// Recursively remove all siblings above the DOCHDR
 				removePreviousSiblings(ele, i);
 				content = e.text();
-
-				if(docno.equals("WT01-B01-8")) { //"WT01-B01-44" has trimming issue where HTML is missing
-					//System.out.println("\n\nPost Trim\n--------\n" + e.toString());
-				}
-				contentMethod = "DOCHDR Trim";
 			} else {
 				// In the unlikely scenario that the document is malformed and doesn't have an
 				// html, body, or DOCHDR tag, then instead set the content as the entire <DOC>
 				content = e.text();
-
-				contentMethod = "Full";
 			}
 			
 			// Store the document to be served in searches
@@ -422,7 +394,6 @@ public class ElasticSearchHandler {
 					.field("olddocno", olddocno).field("keywords", keywords).field("content", content)
 					.field("url", HTML_PATH_PUBLIC + docno + ".html").endObject();
 			
-			//System.out.println("DocNo:\t" + docno + "\tContent Method:\t" + contentMethod);
 			return Strings.toString(builder);
 		} catch (Exception exc) {
 			exc.printStackTrace();
@@ -493,8 +464,13 @@ public class ElasticSearchHandler {
 			Document entireDoc = Jsoup.parse(new File(path), null);
 			
 			for(int i = 0; i < entireDoc.select("top").size(); i++) {
+				// Pull out each <top> element to be parsed
 				Element topic = entireDoc.select("top").get(i);
+				
+				// Form the queries from the Element
 				String[] results = searchFromTopic(topic);
+				
+				// Store results to be returned and written to the output file
 				jsonMap.put(results[0], results[1]);
 			}
 			
