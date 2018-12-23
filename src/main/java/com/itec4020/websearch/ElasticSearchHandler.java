@@ -519,7 +519,7 @@ public class ElasticSearchHandler {
 		String[] results = new String[2];
 		results[0] = topicNum;
 		// Perform the search with the data provided
-		results[1] = search(title, desc + " " + narr);
+		results[1] = search(title, desc);
 		
 		return results;
 	}
